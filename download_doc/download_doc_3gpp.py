@@ -66,9 +66,9 @@ def _make_agent_session(kind: str, proxy: Optional[str], agent_id: int,
     except Exception: pass
     return landing, s
 
-def fetch_3gpp_docs_queue(base_path: str, download_urls: List[str], proxy: Optional[str]) -> List[Dict[str, Any]]:
-    create_subfolder_when_absent(Path(base_path), "DOCS")   # type: ignore[name-defined]
-    download_path = Path(base_path) / "DOCS"
+def fetch_3gpp_docs_queue(base_path: str, download_urls: List[str], doc_dir: str, proxy: Optional[str]) -> List[Dict[str, Any]]:
+    create_subfolder_when_absent(Path(base_path), doc_dir)   # type: ignore[name-defined]
+    download_path = Path(base_path) / doc_dir
 
     # ===== セッション取得 =====
     LANDING, sess = get_landing_and_session("3gpp")  # type: ignore[name-defined]

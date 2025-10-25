@@ -36,3 +36,9 @@ RAWリスト → 正規化した「ドキュメントリスト」を生成
 1. main_make_citation.py
 
 文献番号を指定 → 引用形式を出力
+
+# インストラクター
+
+```bash
+  pyinstaller --onefile --clean --console --paths . -n mytool --hidden-import win32timezone --hidden-import requests --hidden-import urllib3 --hidden-import certifi --hidden-import idna --hidden-import charset_normalizer --hidden-import pandas --hidden-import numpy --hidden-import openpyxl main_fetch_and_convert.py
+```

@@ -58,7 +58,13 @@ from combine.extract_paragraphs import(
     convert_office_to_html
 )
 
+from combine.convert_from_get_files_to_PDF import (
+    convert_list_to_pdf_in_dir_parallel
+)
 
+from folder_and_file.create_subfolder_when_absent import (
+    create_subfolder_when_absent,
+    )
 
 
 
@@ -433,37 +439,46 @@ def run(excel_path: Path) -> int:
     xlsx_dir = xr.xread("cell", 5, 3, sheet = sheet_initial_setup)
     zip_dir = xr.xread("cell", 6, 3, sheet = sheet_initial_setup)
     doc_dir = xr.xread("cell", 7, 3, sheet = sheet_initial_setup)
-    combined_html_dir = xr.xread("cell", 8, 3, sheet = sheet_initial_setup)
+    combined_html_name = xr.xread("cell", 8, 3, sheet = sheet_initial_setup)
 
     hyperlink_3gppp = xr.xread("cell", 1, 10, sheet = sheet_initial_setup)
     hyperlink_ieee = xr.xread("cell", 2, 10, sheet = sheet_initial_setup)
+
+    download_dir = Path(download_dir)
+
+    create_subfolder_when_absent(download_dir.parent, download_dir.name)
+
+    create_subfolder_when_absent(download_dir, html_dir)
+    create_subfolder_when_absent(download_dir, html_dir)
+    create_subfolder_when_absent(download_dir, xlsx_dir)
+    create_subfolder_when_absent(download_dir, zip_dir)
+    create_subfolder_when_absent(download_dir, doc_dir)
+
+    html_path = download_dir / str(html_dir)
+    xlsx_path = download_dir / str(xlsx_dir)
 
 
     if str(database) == "3gpp":
         print("3gpp")
         download_urls =  xr.xread("col", 1, header=True, sheet = sheet_url_list_path, hyperlink = hyperlink_3gppp)
-        res = fetch_3gpp_docs_queue(str(download_dir),download_urls,proxy=proxy_url)
-        save_results_to_xlsx(res,str(download_dir),"out_"+str(database))
-        res_zip = extract_zip_to_docs_from_fold(str(download_dir),"out_"+str(database))
-        write_res_zip_paths_to_xlsx(res_zip,str(download_dir),"out_file_"+str(database))
-        l = read_column_as_list(str(download_dir),"out_file_"+str(database),0)
-        convert_office_to_html(l,Path(download_dir) / "combine.html")
+        res = fetch_3gpp_docs_queue(str(download_dir),download_urls,zip_dir,proxy=proxy_url)
+        save_results_to_xlsx(res,str(xlsx_path),"out_"+str(database))
+        
+        res_zip = extract_zip_to_docs_from_fold(str(xlsx_path),"out_"+str(database),doc_dir)
+        write_res_zip_paths_to_xlsx(res_zip,str(xlsx_path),"out_file_"+str(database))
+        
+        l = read_column_as_list(str(xlsx_path),"out_file_"+str(database),0)
+        convert_office_to_html(l,str(html_path),combined_html_name)
+        convert_list_to_pdf_in_dir_parallel(l,str(download_dir),doc_dir)
 
     if str(database) == "ieee":
         print("ieee")
-        download_urls =  xr.xread("col", 1, header=True, sheet = sheet_url_list_path, hyperlink = hyperlink_ieee)
-        res = fetch_ieee_docs_queue(str(download_dir),download_urls,proxy=proxy_url)
-        save_results_to_xlsx(res,str(download_dir),"out_"+str(database))
-        l = read_column_as_list(str(download_dir),"out_"+str(database),5)
-        convert_office_to_html(l,Path(download_dir) / "combine.html")
-
-    # --- 例: 設定値の読み取り（必要ならコメントアウト解除） ---
-    # xr = ExcelReader(excel_path)
-    # first_row = xr.xread("row", 1, header=False)    # 1行目をリスト[str]で
-    # fifth_col = xr.xread("col", 5, header=True)     # 5列目、1行目は見出しなのでスキップ
-    # v_10_2   = xr.xread("cell", 10, 2)              # (10行,2列) を単一の str で
-    # logging.getLogger(__app_name__).info("row1=%s, col5(len)=%d, (10,2)=%s",
-    #                                      first_row, len(fifth_col), v_10_2)
+        download_urls =  xr.xread("col", 1, header=True, sheet = sheet_url_list_path, hyperlink = hyperlink_3gppp)
+        res = fetch_ieee_docs_queue(str(download_dir),download_urls,zip_dir,proxy=proxy_url)
+        save_results_to_xlsx(res,str(xlsx_path),"out_"+str(database))
+        l = read_column_as_list(str(xlsx_path),"out_"+str(database),5)
+        convert_office_to_html(l,str(html_path),combined_html_name)
+        convert_list_to_pdf_in_dir_parallel(l,str(download_dir),doc_dir)
 
     logging.getLogger(__app_name__).info("run() executed with: %s", excel_path)
     return 0

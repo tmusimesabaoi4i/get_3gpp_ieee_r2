@@ -101,7 +101,7 @@ from time import sleep
 
 
 
-def extract_zip_to_docs(zip_path: str, overwrite: bool = False) -> List[Path]:
+def extract_zip_to_docs(zip_path: str, doc_dir:str, overwrite: bool = False) -> List[Path]:
     """
     C:\...\ZIP_74362\110-e\R2-2004593.zip を
     C:\...\DOCS_74362\110-e\ に展開する。
@@ -110,7 +110,7 @@ def extract_zip_to_docs(zip_path: str, overwrite: bool = False) -> List[Path]:
     返り値: 作成/更新したファイルの Path リスト
     """
     p = Path(zip_path)
-    dest_dir = p.parent
+    dest_dir = p.parent.parent / doc_dir
     created: List[Path] = []
 
     print(f"🗜 解凍対象: {p.name}")
@@ -167,7 +167,7 @@ def extract_zip_to_docs(zip_path: str, overwrite: bool = False) -> List[Path]:
 from pathlib import Path
 from openpyxl import load_workbook
 
-def extract_zip_to_docs_from_fold(download_path: str, file_name: str, overwrite: bool = False) -> List[List[Path]]:
+def extract_zip_to_docs_from_fold(download_path: str, file_name: str, doc_dir: str, overwrite: bool = False) -> List[List[Path]]:
     p = Path(download_path) / file_name
     res_zip: List[List[Path]] = []
     if p.suffix.lower() != ".xlsx":
@@ -192,7 +192,7 @@ def extract_zip_to_docs_from_fold(download_path: str, file_name: str, overwrite:
         # 2行目以降を走査して saved_path をすべてプリント
         for row in ws.iter_rows(min_row=2, values_only=True):
             v = row[saved_idx] if saved_idx < len(row) else None
-            target = extract_zip_to_docs(v)
+            target = extract_zip_to_docs(v,doc_dir)
             res_zip.append(target)
     return res_zip
 
