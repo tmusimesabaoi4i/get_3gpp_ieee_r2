@@ -42,3 +42,13 @@ RAWリスト → 正規化した「ドキュメントリスト」を生成
 ```bash
   pyinstaller --onefile --clean --console --paths . -n mytool --hidden-import win32timezone --hidden-import requests --hidden-import urllib3 --hidden-import certifi --hidden-import idna --hidden-import charset_normalizer --hidden-import pandas --hidden-import numpy --hidden-import openpyxl main_fetch_and_convert.py
 ```
+
+# 使い方
+
+```bash
+mytool.exe --drive C --db ieee --excel "E:\Users\IYEA4586\downloads\in.xlsx"
+```
+
+```bash
+mytool.exe --drive C --db ieee --excel "C:\Users\yohei\Downloads\in.xlsx"
+```
