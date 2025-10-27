@@ -465,7 +465,7 @@ def run(excel_path: Path) -> int:
 
     html_in_path =  xr.xread("col", 1, header=True, sheet = sheet_search_word_from_html)
     words = xr.xread("col", 2, header=True, sheet = sheet_search_word_from_html)
-    html_out_path =  xr.xread("cell", 2, 3, sheet = sheet_initial_setup)
+    html_out_path =  xr.xread("cell", 2, 3, sheet = sheet_search_word_from_html)
 
     if str(database) == "3gpp":
         print("3gpp")
